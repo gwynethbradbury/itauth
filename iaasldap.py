@@ -211,62 +211,6 @@ class LDAPUser():
         if service_name in usersgroups:
             return True
         return False
-    
-    def change_password(self,old_password,new_password,repeat_password):
-        success=0
-        msg="Could not change password. "
-        if self.is_correct_password(old_password):
-            if new_password==repeat_password:
-                # change the password
-                self._set_password(self.uid_trim(),old_password,new_password)
-                msg="Password changed successfully"
-                success=1
-            else:
-                msg=msg+"New password inconsistent."
-        else:
-            msg=msg+"Old password does not match."
-        
-        return success, msg
-    
-    def change_passwordAD(self,user='hert1424',current_pass='foo',new_pass='bar',repeat_password='bar'):
-        
-        import ldap
-        import ldap.modlist as modlist
-        import base64
-        
-        success = 0
-        msg = "Could not change password. "
-        if self.is_correct_password(current_pass):
-            if new_pass == repeat_password:
-                # change the password
-                
-                try:
-                    ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-                    l = ldap.initialize('ldaps://ouce-dc0.ouce.ox.ac.uk')
-                    l.simple_bind_s(user + '@ouce.ox.ac.uk', current_pass)
-                    dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
-                    unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
-                    password_value = unicode_pass.encode('utf-16-le')
-                    add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
-                    l.modify_s(dn, add_pass)
-                    l.unbind_s()
-                    
-                    
-                    # self._set_password(self.uid_trim(), current_pass, new_pass)
-                    msg = "Password changed successfully"
-                    success = 1
-                
-                except Exception as e:
-                    print(e)
-                    success=0
-                    msg=msg + e.__str__()
-            else:
-                msg = msg + "New password inconsistent."
-        else:
-            msg = msg + "Old password does not match."
-                
-        return success, msg
-
 
 
     def _set_password(self, uid, oldpw,newpw):
@@ -318,7 +262,7 @@ class LDAPUser():
                 l.unbind_s()
 
 
-                    
+
 
                     # self._password = bcrypt.generate_password_hash(plaintext)
 
@@ -326,4 +270,63 @@ class LDAPUser():
         # todo:
         return True
 # return bcrypt.check_password_hash(self._password, plaintext)
+
+
+
+
+def change_password(self, old_password, new_password, repeat_password):
+    success = 0
+    msg = "Could not change password. "
+    if self.is_correct_password(old_password):
+        if new_password == repeat_password:
+            # change the password
+            self._set_password(self.uid_trim(), old_password, new_password)
+            msg = "Password changed successfully"
+            success = 1
+        else:
+            msg = msg + "New password inconsistent."
+    else:
+        msg = msg + "Old password does not match."
+
+    return success, msg
+
+def is_correct_password(current_pass):
+    return True
+
+def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar'):
+    import ldap
+    import ldap.modlist as modlist
+    import base64
+
+    success = 0
+    msg = "Could not change password. "
+    if is_correct_password(current_pass):
+        if new_pass == repeat_password:
+            # change the password
+
+            try:
+                ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+                l = ldap.initialize('ldaps://ouce-dc0.ouce.ox.ac.uk')
+                l.simple_bind_s(user + '@ouce.ox.ac.uk', current_pass)
+                dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
+                unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
+                password_value = unicode_pass.encode('utf-16-le')
+                add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
+                l.modify_s(dn, add_pass)
+                l.unbind_s()
+
+                # self._set_password(self.uid_trim(), current_pass, new_pass)
+                msg = "Password changed successfully"
+                success = 1
+
+            except Exception as e:
+                print(e)
+                success = 0
+                msg = msg + e.__str__()
+        else:
+            msg = msg + "New password inconsistent."
+    else:
+        msg = msg + "Old password does not match."
+
+    return success, msg
 
