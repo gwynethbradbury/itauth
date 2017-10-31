@@ -62,64 +62,65 @@ class LDAPUser():
 #             print e
 #         l.unbind_s()
 
-'''
+    '''
     gets a user's full name and returns in the format "Firstname Surname"
     '''
-        def get_fullname(self,uid=""):
+    def get_fullname(self,uid=""):
         if ldapconfig.test:
             return "Firstname Surname"
-else:
-    import ldap
-        if uid=="":
-            uid=self.uid_trim()
+        else:
+            import ldap
+            if uid=="":
+                uid=self.uid_trim()
             suffix=self.uid_suffix()
             if (suffix=="ox.ac.uk"):
                 searchFilter = "(&(objectClass=user)(sAMAccountName=%s))" % uid
-                    searchAttribute = ["displayName"]
-                    searchScope = ldap.SCOPE_SUBTREE
-                        l = ldap.initialize(ldapconfig.ldaphost_ad)
-                        try:
-                            l.protocol_version = ldap.VERSION3
-                                l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
-                                valid = True
-                                    except Exception, error:
-                                        print error
-                                            try:
-                                                ldap_result_id = l.search(ldapconfig.basedn_ad, searchScope, searchFilter, searchAttribute)
-                                                result_type, result_data = l.result(ldap_result_id, 0)
-                                                try:
-                                                    return result_data[0][1]['displayName'][0]
-                                                        except Exception as e:
-                                                            print(e)
-                                                            return "Firstname Surname"
-                                                                except ldap.LDAPError, e:
-                                                                    return 'An Error Occurred (AD)'
-                                                                        l.unbind_s()
-                                                                    
-                                                                    
-                                                                    
-                                                                    else:
-                                                                        searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
-                                                                            searchAttribute = ["cn"]
-                                                                            searchScope = ldap.SCOPE_SUBTREE
-                                                                                l = ldap.initialize(ldapconfig.ldaphost)
-                                                                                try:
-                                                                                    l.protocol_version = ldap.VERSION3
-                                                                                        l.simple_bind_s(ldapconfig.username, ldapconfig.password)
-                                                                                        valid = True
-                                                                                            except Exception, error:
-                                                                                                print error
-                                                                                                    try:
-                                                                                                        ldap_result_id = l.search(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
-                                                                                                        result_type, result_data = l.result(ldap_result_id, 0)
-                                                                                                        try:
-                                                                                                            return result_data[0][1]['cn'][0]
-                                                                                                                except Exception as e:
-                                                                                                                    print(e)
-                                                                                                                    return "Firstname Surname"
-                                                                                                                        except ldap.LDAPError, e:
-                                                                                                                            return 'An Error Occurred'
-                                                                                                                                l.unbind_s()
+                searchAttribute = ["displayName"]
+                searchScope = ldap.SCOPE_SUBTREE
+                l = ldap.initialize(ldapconfig.ldaphost_ad)
+                try:
+                    l.protocol_version = ldap.VERSION3
+                    l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
+                    valid = True
+                except Exception, error:
+                    print error
+                try:
+                    ldap_result_id = l.search(ldapconfig.basedn_ad, searchScope, searchFilter, searchAttribute)
+                    result_type, result_data = l.result(ldap_result_id, 0)
+                    try:
+                        return result_data[0][1]['displayName'][0]
+                    except Exception as e:
+                        print(e)
+                        return "Firstname Surname"
+                except ldap.LDAPError, e:
+                    return 'An Error Occurred (AD)'
+                l.unbind_s()
+
+
+
+            else:
+                searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
+                searchAttribute = ["cn"]
+                searchScope = ldap.SCOPE_SUBTREE
+                l = ldap.initialize(ldapconfig.ldaphost)
+                try:
+                    l.protocol_version = ldap.VERSION3
+                    l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+                    valid = True
+                except Exception, error:
+                    print error
+                try:
+                    ldap_result_id = l.search(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
+                    result_type, result_data = l.result(ldap_result_id, 0)
+                    try:
+                        return result_data[0][1]['cn'][0]
+                    except Exception as e:
+                        print(e)
+                        return "Firstname Surname"
+                except ldap.LDAPError, e:
+                    return 'An Error Occurred'
+                l.unbind_s()
+
 
 
 # # For testing
