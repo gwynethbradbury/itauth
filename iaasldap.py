@@ -1,6 +1,6 @@
-import os
 from flask import request
-import ldapconfig
+
+from main.auth import ldapconfig
 
 
 class LDAPUser():
@@ -165,7 +165,6 @@ class LDAPUser():
     '''
     def get_groups_filtered(self, filter):
         uid = self.uid_trim()
-        import string
         if ldapconfig.test:
             return ["filteredgroup1", "filteredgroup2"]
         else:
@@ -177,7 +176,6 @@ class LDAPUser():
                     groups.append(res)
             print groups
             return groups
-
 
     '''
     check whether this user is authorised against the given project
