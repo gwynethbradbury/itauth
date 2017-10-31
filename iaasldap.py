@@ -128,7 +128,7 @@ class LDAPUser():
 #                       "cenv0252",
 #                       "hert1424"]
 
-'''gets a list of the groups for which this user is a member'''
+    '''gets a list of the groups for which this user is a member'''
     def get_groups(self):
         uid = self.uid_trim()
         groups = ['all_users']
@@ -161,34 +161,34 @@ class LDAPUser():
                 return []
             l.unbind_s()
 
-'''
+    '''
     filters this users groups for a given service
     '''
-        def get_groups_filtered(self, filter):
+    def get_groups_filtered(self, filter):
         uid = self.uid_trim()
         import string
         if ldapconfig.test:
             return ["filteredgroup1", "filteredgroup2"]
-else:
-    groups=[]
-    result_set = self.get_groups()
-    # result_set is a list containing lists of tuples, each containing a list - fun!
-    for res in result_set:
-        if res.find(filter) != -1:
-            groups.append(res)
+        else:
+            groups=[]
+            result_set = self.get_groups()
+            # result_set is a list containing lists of tuples, each containing a list - fun!
+            for res in result_set:
+                if res.find(filter) != -1:
+                    groups.append(res)
             print groups
             return groups
 
 
-'''
+    '''
     check whether this user is authorised against the given project
     '''
-        def is_authenticated(self):
+    def is_authenticated(self):
         #todo: complete authentication rules
         return True
 
-def is_active(self):
-    return True
+    def is_active(self):
+        return True
     
     def has_role(self,role):
         if role in self.get_groups():
@@ -260,70 +260,70 @@ def is_active(self):
                     print(e)
                     success=0
                     msg=msg + e.__str__()
-        else:
-            msg = msg + "New password inconsistent."
+            else:
+                msg = msg + "New password inconsistent."
         else:
             msg = msg + "Old password does not match."
                 
-    return success, msg
+        return success, msg
 
 
 
-def _set_password(self, uid, oldpw,newpw):
-    #todo
-    # pass
+    def _set_password(self, uid, oldpw,newpw):
+        #todo
+        # pass
+
+        if ldapconfig.test:
+            return
+
+            import ldap
+
+            suffix = self.uid_suffix()
+            if (suffix == "ox.ac.uk"):
+                # searchFilter = "(&(objectClass=user)(sAMAccountName=%s))" % uid
+                # searchAttribute = ["displayName"]
+                # searchScope = ldap.SCOPE_SUBTREE
+                l = ldap.initialize(ldapconfig.ldaphost_ad)
+                l.protocol_version = ldap.VERSION3
+                try:
+                    l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
+                except Exception, error:
+                    print error
+
+                try:
+                    l.passwd_s(uid, oldpw, newpw)
+
+                except ldap.LDAPError, e:
+                    return 'An Error Occurred (AD)'
+                l.unbind_s()
     
-    if ldapconfig.test:
-        return
-        
-        import ldap
-        
-        suffix = self.uid_suffix()
-        if (suffix == "ox.ac.uk"):
-            # searchFilter = "(&(objectClass=user)(sAMAccountName=%s))" % uid
-            # searchAttribute = ["displayName"]
+    
+    
+        else:
+            # searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
+            # searchAttribute = ["cn"]
             # searchScope = ldap.SCOPE_SUBTREE
-            l = ldap.initialize(ldapconfig.ldaphost_ad)
+            l = ldap.initialize(ldapconfig.ldaphost)
             l.protocol_version = ldap.VERSION3
             try:
-                l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
+                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
             except Exception, error:
                 print error
-            
+
             try:
                 l.passwd_s(uid, oldpw, newpw)
-            
+
             except ldap.LDAPError, e:
                 return 'An Error Occurred (AD)'
-            l.unbind_s()
-    
-    
-    
-    else:
-        # searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
-        # searchAttribute = ["cn"]
-        # searchScope = ldap.SCOPE_SUBTREE
-        l = ldap.initialize(ldapconfig.ldaphost)
-        l.protocol_version = ldap.VERSION3
-            try:
-                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
-        except Exception, error:
-            print error
-            
-            try:
-                l.passwd_s(uid, oldpw, newpw)
-        
-        except ldap.LDAPError, e:
-            return 'An Error Occurred (AD)'
-            l.unbind_s()
-                
-                
-                
-                
-                # self._password = bcrypt.generate_password_hash(plaintext)
-                
-                def is_correct_password(self, plaintext):
-# todo:
-return True
+                l.unbind_s()
+
+
+                    
+
+                    # self._password = bcrypt.generate_password_hash(plaintext)
+
+    def is_correct_password(self, plaintext):
+        # todo:
+        return True
 # return bcrypt.check_password_hash(self._password, plaintext)
 
