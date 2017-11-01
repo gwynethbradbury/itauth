@@ -332,7 +332,7 @@ def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repe
                 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
                 l = ldap.initialize(ldapconfig.ldaphost_ad)
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
-                l.simple_bind_s(dn)#user + '@ouce.ox.ac.uk', current_pass)
+                l.simple_bind_s(dn,current_pass)#user + '@ouce.ox.ac.uk', current_pass)
                 # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
                 unicode_pass = new_pass
                 password_value = unicode_pass.encode('utf-16-le')
