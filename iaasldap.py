@@ -316,7 +316,7 @@ def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repe
                 # password_value = unicode_pass.encode('utf-16-le')
                 # add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
                 # l.modify_s(dn, add_pass)
-                l.passwd_s(user, oldpw=current_pass.encode('utf-16-le'),new_pass=new_pass.encode('utf-16-le'))
+                l.passwd_s(user, oldpw=current_pass.encode('utf-16-le'), newpw=new_pass.encode('utf-16-le'))
                 l.unbind_s()
 
                 # self._set_password(self.uid_trim(), current_pass, new_pass)
