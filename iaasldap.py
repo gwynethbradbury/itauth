@@ -294,6 +294,30 @@ def is_correct_password(current_pass):
     return True
 
 def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar'):
+    # import ldap
+    # searchFilter = '(|(&(objectClass=*)(memberUid=%s)))' % uid
+    # searchAttribute = ["cn"]
+    # searchScope = ldap.SCOPE_SUBTREE
+    # l = ldap.initialize(ldapconfig.ldaphost)
+    # try:
+    #     l.protocol_version = ldap.VERSION3
+    #     l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+    #     valid = True
+    # except Exception, error:
+    #     print error
+    # try:
+    #     result_set = l.search_s(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
+    #     # result_set is a list containing lists of tuples, each containing a list - fun!
+    #     for res in result_set:
+    #         # disentangle the various nested stuff!
+    #         groups.append(((res[1])['cn'])[0])
+    #     # print groups
+    #     return groups
+    # except ldap.LDAPError, e:
+    #     return []
+    # l.unbind_s()
+
+
     import ldap
     import ldap.modlist as modlist
     import base64
@@ -306,9 +330,9 @@ def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repe
 
             try:
                 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-                l = ldap.initialize('ldaps://ouce-dc0.ouce.ox.ac.uk')
-                l.simple_bind_s(user + '@ouce.ox.ac.uk', current_pass)
+                l = ldap.initialize(ldapconfig.ldaphost_ad)
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
+                l.simple_bind_s(dn)#user + '@ouce.ox.ac.uk', current_pass)
                 # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
                 unicode_pass = new_pass
                 password_value = unicode_pass.encode('utf-16-le')
