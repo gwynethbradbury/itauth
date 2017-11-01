@@ -294,28 +294,6 @@ def is_correct_password(current_pass):
     return True
 
 def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar'):
-    # import ldap
-    # searchFilter = '(|(&(objectClass=*)(memberUid=%s)))' % uid
-    # searchAttribute = ["cn"]
-    # searchScope = ldap.SCOPE_SUBTREE
-    # l = ldap.initialize(ldapconfig.ldaphost)
-    # try:
-    #     l.protocol_version = ldap.VERSION3
-    #     l.simple_bind_s(ldapconfig.username, ldapconfig.password)
-    #     valid = True
-    # except Exception, error:
-    #     print error
-    # try:
-    #     result_set = l.search_s(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
-    #     # result_set is a list containing lists of tuples, each containing a list - fun!
-    #     for res in result_set:
-    #         # disentangle the various nested stuff!
-    #         groups.append(((res[1])['cn'])[0])
-    #     # print groups
-    #     return groups
-    # except ldap.LDAPError, e:
-    #     return []
-    # l.unbind_s()
 
 
     import ldap
@@ -334,10 +312,11 @@ def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repe
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
                 l.simple_bind_s(dn,current_pass)#user + '@ouce.ox.ac.uk', current_pass)
                 # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
-                unicode_pass = new_pass
-                password_value = unicode_pass.encode('utf-16-le')
-                add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
-                l.modify_s(dn, add_pass)
+                # unicode_pass = new_pass
+                # password_value = unicode_pass.encode('utf-16-le')
+                # add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
+                # l.modify_s(dn, add_pass)
+                l.passwd_s(user, oldpw=current_pass.encode('utf-16-le'),new_pass=new_pass.encode('utf-16-le'))
                 l.unbind_s()
 
                 # self._set_password(self.uid_trim(), current_pass, new_pass)
