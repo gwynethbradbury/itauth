@@ -333,8 +333,8 @@ def change_passwordAD( user='hert1424', current_pass='foo', new_pass='bar', repe
                 l = ldap.initialize(ldapconfig.ldaphost_ad)
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
                 l.simple_bind_s(dn,current_pass)#user + '@ouce.ox.ac.uk', current_pass)
-                # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
-                unicode_pass = new_pass
+                unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')
+                # unicode_pass = new_pass
                 password_value = unicode_pass.encode('utf-16-le')
                 add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
                 l.modify_s(dn, add_pass)
