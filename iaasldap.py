@@ -15,7 +15,7 @@ class LDAPUser():
         '''
     def uid_trim(self):
         if ldapconfig.test:
-            return "cenv0594"
+            return "soge"
         else:
             import string
             uid = request.remote_user
