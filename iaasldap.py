@@ -268,7 +268,11 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
                     dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
 
                 # l.simple_bind_s(dn,current_pass)
-                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+                if isAD:
+                    l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
+                else:
+                    l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+
 
 
                 #IAAS
@@ -276,7 +280,7 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
                 #AD
                 if isAD:
                     # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
-                    unicode_pass = new_pass
+                    unicode_pass = "\""+new_pass+"\""
                     password_value = unicode_pass.encode('utf-16-le')
                     add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
 
