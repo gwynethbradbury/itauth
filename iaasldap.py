@@ -19,6 +19,11 @@ class LDAPUser():
         else:
             import string
             uid = request.remote_user
+            if uid == None:
+               uid = request.environ.get('HTTP_REMOTE_USER')
+            if uid == None:
+               uid = "nobody@ox.ac.uk"
+            print request.environ
             uid_stripped = string.split(uid, '@')[0]
             print uid_stripped
             return uid_stripped
@@ -31,6 +36,10 @@ class LDAPUser():
         else:
             import string
             uid = request.remote_user
+            if uid == None:
+               uid = request.environ.get('HTTP_REMOTE_USER')
+            if uid == None:
+               uid = "nobody@ox.ac.uk"
             uid_stripped = string.split(uid, '@')[1]
             print uid_stripped
             return uid_stripped
