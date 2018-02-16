@@ -15,7 +15,7 @@ class LDAPUser():
         '''
     def uid_trim(self):
         if ldapconfig.test:
-            return "soge"
+            return "cenv0594"
         else:
             import string
             uid = request.remote_user
@@ -27,7 +27,7 @@ class LDAPUser():
         '''
     def uid_suffix(self):
         if ldapconfig.test:
-            return "development_suffix"
+            return "ox.ac.uk"
         else:
             import string
             uid = request.remote_user
@@ -236,7 +236,7 @@ class LDAPUser():
 def is_correct_password(current_pass):
     return True
 
-def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar', isAD=True):
+def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar', isAD=True,full=False):
 
 
 
@@ -247,55 +247,60 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
 
     success = 0
     msg = "Could not change password. "
-    if is_correct_password(current_pass):
-        if new_pass == repeat_password:
-            # change the password
 
-            try:
-                ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+    # full authentication required as user not logged in
+    if full==True:
+        if not is_correct_password(current_pass):
+            msg = msg + "Old password does not match."
+            return 0, msg
 
-                host=ldapconfig.ldaphost#iaas
-                if isAD:
-                    host=ldapconfig.ldaphost_ad
-                l = ldap.initialize(host)
+    # user already logged in
+    if new_pass == repeat_password:
+        # change the password
 
-                l.protocol_version = ldap.VERSION3
+        try:
+            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
-                #IAAS
-                dn="uid=" + user + ",ou=ITStaff,dc=iaas,dc=ouce,dc=ox,dc=ac,dc=uk"
-                #AD
-                if isAD:
-                    dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
+            host=ldapconfig.ldaphost#iaas
+            if isAD:
+                host=ldapconfig.ldaphost_ad
+            l = ldap.initialize(host)
 
-                # l.simple_bind_s(dn,current_pass)
-                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+            l.protocol_version = ldap.VERSION3
 
+            #IAAS
+            dn="uid=" + user + ",ou=ITStaff,dc=iaas,dc=ouce,dc=ox,dc=ac,dc=uk"
+            #AD
+            if isAD:
+                dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
 
-                #IAAS
-                add_pass = [(ldap.MOD_REPLACE, 'userPassword', [new_pass])]#IAAS
-                #AD
-                if isAD:
-                    # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
-                    unicode_pass = new_pass
-                    password_value = unicode_pass.encode('utf-16-le')
-                    add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
+            # l.simple_bind_s(dn,current_pass)
+            l.simple_bind_s(ldapconfig.username, ldapconfig.password)
 
 
-                l.modify_s(dn, add_pass)
-                l.unbind_s()
+            #IAAS
+            add_pass = [(ldap.MOD_REPLACE, 'userPassword', [new_pass])]#IAAS
+            #AD
+            if isAD:
+                # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
+                unicode_pass = new_pass
+                password_value = unicode_pass.encode('utf-16-le')
+                add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
 
-                # self._set_password(self.uid_trim(), current_pass, new_pass)
-                msg = "Password changed successfully"
-                success = 1
 
-            except Exception as e:
-                print(e)
-                success = 0
-                msg = msg + e.__str__()
-        else:
-            msg = msg + "New password inconsistent."
+            l.modify_s(dn, add_pass)
+            l.unbind_s()
+
+            # self._set_password(self.uid_trim(), current_pass, new_pass)
+            msg = "Password changed successfully"
+            success = 1
+
+        except Exception as e:
+            print(e)
+            success = 0
+            msg = msg + e.__str__()
     else:
-        msg = msg + "Old password does not match."
+        msg = msg + "New password inconsistent."
 
     return success, msg
 
