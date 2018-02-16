@@ -19,6 +19,11 @@ class LDAPUser():
         else:
             import string
             uid = request.remote_user
+            if uid == None:
+               uid = request.environ.get('HTTP_REMOTE_USER')
+            if uid == None:
+               uid = "nobody@ox.ac.uk"
+            print request.environ
             uid_stripped = string.split(uid, '@')[0]
             print uid_stripped
             return uid_stripped
@@ -31,6 +36,10 @@ class LDAPUser():
         else:
             import string
             uid = request.remote_user
+            if uid == None:
+               uid = request.environ.get('HTTP_REMOTE_USER')
+            if uid == None:
+               uid = "nobody@ox.ac.uk"
             uid_stripped = string.split(uid, '@')[1]
             print uid_stripped
             return uid_stripped
@@ -266,7 +275,16 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
                 host=ldapconfig.ldaphost_ad
             l = ldap.initialize(host)
 
-            l.protocol_version = ldap.VERSION3
+#<<<<<<< HEAD
+#            l.protocol_version = ldap.VERSION3
+#=======
+            # l.simple_bind_s(dn,current_pass)
+            if isAD:
+                l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
+            else:
+                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+
+#>>>>>>> 98ab7a4578d3d135a50bbb607dd734113e13be4e
 
             #IAAS
             dn="uid=" + user + ",ou=ITStaff,dc=iaas,dc=ouce,dc=ox,dc=ac,dc=uk"
@@ -274,8 +292,19 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
             if isAD:
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
 
-            # l.simple_bind_s(dn,current_pass)
-            l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+#<<<<<<< HEAD
+#            # l.simple_bind_s(dn,current_pass)
+#            l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+#=======
+            #IAAS
+            add_pass = [(ldap.MOD_REPLACE, 'userPassword', [new_pass])]#IAAS
+            #AD
+            if isAD:
+                # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
+                unicode_pass = "\""+new_pass+"\""
+                password_value = unicode_pass.encode('utf-16-le')
+                add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
+#>>>>>>> 98ab7a4578d3d135a50bbb607dd734113e13be4e
 
 
             #IAAS
