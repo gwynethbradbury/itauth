@@ -250,7 +250,7 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
     import ldap
     import ldap.modlist as modlist
     import base64
-
+    dn=''
     success = 0
     msg = "Could not change password. "
 
