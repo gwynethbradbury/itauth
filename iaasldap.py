@@ -308,6 +308,6 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
             msg = msg + e.__str__()
     else:
         msg = msg + "New password inconsistent."
-
+    print dn+" "+msg
     return success, msg
 
