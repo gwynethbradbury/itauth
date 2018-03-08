@@ -46,30 +46,29 @@ class LDAPUser():
 
 
 
-# def get_dn(uid):
-#     if ldapconfig.test:
-#         return ""
-#     else:
-#         import ldap
-#         searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
-#         searchAttribute = ["dn"]
-#         searchScope = ldap.SCOPE_SUBTREE
-#         l = ldap.initialize(ldapconfig.ldaphost)
-#         try:
-#             l.protocol_version = ldap.VERSION3
-#             l.simple_bind_s(ldapconfig.username, ldapconfig.password)
-#             valid = True
-#         except Exception, error:
-#             print error
-#         try:
-#             ldap_result_id = l.search(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
-#             result_set = []
-#             result_type, result_data = l.result(ldap_result_id, 0)
-#             print result_data
-#             return result_data
-#         except ldap.LDAPError, e:
-#             print e
-#         l.unbind_s()
+    def get_dn(uid):
+        if ldapconfig.test:
+         return ""
+        else:
+            import ldap
+            searchFilter = "(&(uid=%s)(objectClass=posixAccount))" % uid
+            searchAttribute = ["dn"]
+            searchScope = ldap.SCOPE_SUBTREE
+            l = ldap.initialize(ldapconfig.ldaphost)
+            try:
+                l.protocol_version = ldap.VERSION3
+                l.simple_bind_s(ldapconfig.username, ldapconfig.password)
+                valid = True
+            except Exception, error:
+                print error
+            try:
+                ldap_result_id = l.search(ldapconfig.basedn, searchScope, searchFilter, searchAttribute)
+                result_set = []
+                result_type, result_data = l.result(ldap_result_id, 0)
+                return result_data[0][0]
+            except ldap.LDAPError, e:
+                print e
+            l.unbind_s()
 
     '''
     gets a user's full name and returns in the format "Firstname Surname"
@@ -248,8 +247,6 @@ def is_correct_password(current_pass):
 def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat_password='bar', isAD=True,full=False):
 
 
-
-
     import ldap
     import ldap.modlist as modlist
     import base64
@@ -275,44 +272,25 @@ def change_password( user='hert1424', current_pass='foo', new_pass='bar', repeat
                 host=ldapconfig.ldaphost_ad
             l = ldap.initialize(host)
 
-#<<<<<<< HEAD
-#            l.protocol_version = ldap.VERSION3
-#=======
             # l.simple_bind_s(dn,current_pass)
             if isAD:
                 l.simple_bind_s(ldapconfig.username_ad, ldapconfig.password_ad)
             else:
                 l.simple_bind_s(ldapconfig.username, ldapconfig.password)
 
-#>>>>>>> 98ab7a4578d3d135a50bbb607dd734113e13be4e
-
-            #IAAS
-            dn="uid=" + user + ",ou=ITStaff,dc=iaas,dc=ouce,dc=ox,dc=ac,dc=uk"
             #AD
             if isAD:
                 dn = "cn=" + user + ",cn=users,dc=ouce,dc=ox,dc=ac,dc=uk"
+            else:
+                #IAAS
+                dn=get_dn(user)
 
-#<<<<<<< HEAD
-#            # l.simple_bind_s(dn,current_pass)
-#            l.simple_bind_s(ldapconfig.username, ldapconfig.password)
-#=======
             #IAAS
             add_pass = [(ldap.MOD_REPLACE, 'userPassword', [new_pass])]#IAAS
             #AD
             if isAD:
                 # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
                 unicode_pass = "\""+new_pass+"\""
-                password_value = unicode_pass.encode('utf-16-le')
-                add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
-#>>>>>>> 98ab7a4578d3d135a50bbb607dd734113e13be4e
-
-
-            #IAAS
-            add_pass = [(ldap.MOD_REPLACE, 'userPassword', [new_pass])]#IAAS
-            #AD
-            if isAD:
-                # unicode_pass = unicode('\"' + new_pass + '\"', 'iso-8859-1')# input is already unicode
-                unicode_pass = new_pass
                 password_value = unicode_pass.encode('utf-16-le')
                 add_pass = [(ldap.MOD_REPLACE, 'unicodePwd', [password_value])]
 
